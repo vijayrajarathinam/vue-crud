@@ -1,16 +1,52 @@
 <template>
+    <div>
+    <div class="container">
+    <form class="form-inline">
+    <div class="form-group">
+      <button class="btn btn-info" @click="prev()"><i class="fa fa-chevron-left"></i></button>
+      <button class="btn btn-info" @click="next()"><i class="fa fa-chevron-right"></i></button>
+      <label for="email">Displaying:</label>
+      <p class="form-control-static">{{posts.from}} - {{posts.to}} of {{posts.total}} rows</p>
+    </div>
+<!--    <div class="form-group">
+      <label for="pwd">Search:</label>
+      <div class="form-group">
+       <select class="form-control" id="pwd" name="pwd">
+          <option v-for='column in columns' :value='column'>{{column}}</option>
+      </select>      
+      </div>
+            
+      <div class="form-group">
+      <select class="form-control" id="pwd" name="pwd">
+          <option>=</option>
+      </select>
+      </div>
+    <div class="form-group">
+      <input type="text" class="form-control" id="pwd" placeholder="" name="pwd">
+    </div>
+    </div>-->
+    <!--<button type="submit" class="btn btn-default">Filter</button>-->
+  </form>
+    </div> 
     <div class="container">
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th >title</th>
+                        <th @click="toggleOrder(column)" v-for='column in columns'>{{column}}
+                            <span v-if="query.column===column">
+                                <span v-if="query.direction=='desc'">&uarr;</span>
+                                <span v-if="query.direction=='asc'">&darr;</span>
+                            </span>    
+                        </th>
+<!--                        <th >title</th>
                         <th >description</th>
                         <th >created_at</th>
-                        <th >options</th>
+                        <th >options</th>-->
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="post in posts">
+                    <tr v-for="post in posts.data">
+                        <td>{{post.id}}</td>
                         <td> 
                            {{post.title}}
                         </td>
@@ -29,6 +65,7 @@
                 </tbody>
             </table>
         </div>
+</div>
 </template>
 
 <script>
@@ -36,13 +73,18 @@
     export default {
         data(){
             return{
-                posts:{}
+                search:'',
+                posts:{},
+                columns:{},
+                query:{
+                    page: 1,
+                    column:'id',
+                    direction:'desc',
+                    per_page: 10
+                }
             }
         },created(){
-            axios.get('/api/posts').then((response)=>{
-                //console.log(response.data.posts);
-                this.posts=response.data.posts;
-            })
+            this.fetchIndexData();
         },methods:{
             remove(post){
              let ok =confirm('are you sure you want to delete?');
@@ -55,6 +97,40 @@
                  console.log(error);
              });
              }   
+            },
+            fetchIndexData(){
+               axios.get(`/api/posts?column=${this.query.column}&direction=${this.query.direction}&page=${this.query.page}&per_page=${this.query.per_page}`).then((response)=>{
+                //console.log(response.data.posts);
+                this.posts=response.data.posts;
+                this.columns=response.data.columns;
+                this.columns.push('options');
+            }).catch(error=>{
+                console.log(error);
+            }) 
+            },
+            toggleOrder(column){
+                if(column === this.query.column){
+                    if(this.query.direction === 'desc'){
+                        this.query.direction = 'asc';
+                    }else{
+                        this.query.direction = 'desc';
+                    }
+                }else{
+                    this.query.column = column;
+                    this.query.direction = 'asc';
+                }
+               this.fetchIndexData(); 
+            },
+            next(){
+                if(this.posts.next_page_url){
+                    this.query.page++;
+                    this.fetchIndexData();
+                }
+            },prev(){
+                if(this.posts.prev_page_url){
+                    this.query.page--;
+                    this.fetchIndexData();
+                }
             }
         }
     }

@@ -14,9 +14,15 @@ class PostController extends Controller
      */
     public function index()
     {
-        $post= Post::orderBy('created_at','desc')->get(['id','title','description','created_at']);
+//        $post= Post::orderBy('created_at','desc')->get(['id','title','description','created_at']);
+//        return response()->json([
+//            'posts'=>$post
+//        ]);
+        $post=Post::searchPaginateAndOrder();
+        $columns = Post::$column;
         return response()->json([
-            'posts'=>$post
+            'posts'=>$post,
+            'columns'=>$columns
         ]);
     }
 

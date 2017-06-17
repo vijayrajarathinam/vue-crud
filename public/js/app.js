@@ -11633,35 +11633,112 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
-            posts: {}
+            search: '',
+            posts: {},
+            columns: {},
+            query: {
+                page: 1,
+                column: 'id',
+                direction: 'desc',
+                per_page: 10
+            }
         };
     },
     created: function created() {
-        var _this = this;
-
-        __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get('/api/posts').then(function (response) {
-            //console.log(response.data.posts);
-            _this.posts = response.data.posts;
-        });
+        this.fetchIndexData();
     },
     methods: {
         remove: function remove(post) {
-            var _this2 = this;
+            var _this = this;
 
             var ok = confirm('are you sure you want to delete?');
             if (ok) {
                 __WEBPACK_IMPORTED_MODULE_0_axios___default.a.delete('/api/posts/' + post.id).then(function (response) {
                     //this.$router.push('/');
-                    var idx = _this2.posts.indexOf(post);
-                    _this2.posts.splice(idx, 1);
+                    var idx = _this.posts.indexOf(post);
+                    _this.posts.splice(idx, 1);
                 }).catch(function (error) {
                     console.log(error);
                 });
+            }
+        },
+        fetchIndexData: function fetchIndexData() {
+            var _this2 = this;
+
+            __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get('/api/posts?column=' + this.query.column + '&direction=' + this.query.direction + '&page=' + this.query.page + '&per_page=' + this.query.per_page).then(function (response) {
+                //console.log(response.data.posts);
+                _this2.posts = response.data.posts;
+                _this2.columns = response.data.columns;
+                _this2.columns.push('options');
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        toggleOrder: function toggleOrder(column) {
+            if (column === this.query.column) {
+                if (this.query.direction === 'desc') {
+                    this.query.direction = 'asc';
+                } else {
+                    this.query.direction = 'desc';
+                }
+            } else {
+                this.query.column = column;
+                this.query.direction = 'asc';
+            }
+            this.fetchIndexData();
+        },
+        next: function next() {
+            if (this.posts.next_page_url) {
+                this.query.page++;
+                this.fetchIndexData();
+            }
+        },
+        prev: function prev() {
+            if (this.posts.prev_page_url) {
+                this.query.page--;
+                this.fetchIndexData();
             }
         }
     }
@@ -42073,14 +42150,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "form-control",
     attrs: {
       "type": "text",
-      "placeholder": "Search"
+      "placeholder": "Search "
     }
-  })]), _vm._v(" "), _c('button', {
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "submit"
-    }
-  }, [_vm._v("Submit")])])
+  })])])
 }]}
 module.exports.render._withStripped = true
 if (false) {
@@ -42095,12 +42167,50 @@ if (false) {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
+  return _c('div', [_c('div', {
+    staticClass: "container"
+  }, [_c('form', {
+    staticClass: "form-inline"
+  }, [_c('div', {
+    staticClass: "form-group"
+  }, [_c('button', {
+    staticClass: "btn btn-info",
+    on: {
+      "click": function($event) {
+        _vm.prev()
+      }
+    }
+  }, [_c('i', {
+    staticClass: "fa fa-chevron-left"
+  })]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-info",
+    on: {
+      "click": function($event) {
+        _vm.next()
+      }
+    }
+  }, [_c('i', {
+    staticClass: "fa fa-chevron-right"
+  })]), _vm._v(" "), _c('label', {
+    attrs: {
+      "for": "email"
+    }
+  }, [_vm._v("Displaying:")]), _vm._v(" "), _c('p', {
+    staticClass: "form-control-static"
+  }, [_vm._v(_vm._s(_vm.posts.from) + " - " + _vm._s(_vm.posts.to) + " of " + _vm._s(_vm.posts.total) + " rows")])])])]), _vm._v(" "), _c('div', {
     staticClass: "container"
   }, [_c('table', {
     staticClass: "table table-striped"
-  }, [_vm._m(0), _vm._v(" "), _c('tbody', _vm._l((_vm.posts), function(post) {
-    return _c('tr', [_c('td', [_vm._v(" \n                       " + _vm._s(post.title) + "\n                    ")]), _vm._v(" "), _c('td', [_vm._v("\n                       " + _vm._s(post.description) + " \n                    ")]), _vm._v(" "), _c('td', [_vm._v("\n                       " + _vm._s(post.created_at) + "\n                    ")]), _vm._v(" "), _c('td', [_c('router-link', {
+  }, [_c('thead', [_c('tr', _vm._l((_vm.columns), function(column) {
+    return _c('th', {
+      on: {
+        "click": function($event) {
+          _vm.toggleOrder(column)
+        }
+      }
+    }, [_vm._v(_vm._s(column) + "\n                            "), (_vm.query.column === column) ? _c('span', [(_vm.query.direction == 'desc') ? _c('span', [_vm._v("↑")]) : _vm._e(), _vm._v(" "), (_vm.query.direction == 'asc') ? _c('span', [_vm._v("↓")]) : _vm._e()]) : _vm._e()])
+  }))]), _vm._v(" "), _c('tbody', _vm._l((_vm.posts.data), function(post) {
+    return _c('tr', [_c('td', [_vm._v(_vm._s(post.id))]), _vm._v(" "), _c('td', [_vm._v(" \n                           " + _vm._s(post.title) + "\n                        ")]), _vm._v(" "), _c('td', [_vm._v("\n                           " + _vm._s(post.description) + " \n                        ")]), _vm._v(" "), _c('td', [_vm._v("\n                           " + _vm._s(post.created_at) + "\n                        ")]), _vm._v(" "), _c('td', [_c('router-link', {
       staticClass: "btn btn-info",
       attrs: {
         "to": ("/edit/" + (post.id)),
@@ -42131,10 +42241,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('i', {
       staticClass: "fa fa-trash"
     })])], 1)])
-  }))])])
-},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('thead', [_c('tr', [_c('th', [_vm._v("title")]), _vm._v(" "), _c('th', [_vm._v("description")]), _vm._v(" "), _c('th', [_vm._v("created_at")]), _vm._v(" "), _c('th', [_vm._v("options")])])])
-}]}
+  }))])])])
+},staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
   module.hot.accept()
