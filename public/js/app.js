@@ -11697,8 +11697,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             if (ok) {
                 __WEBPACK_IMPORTED_MODULE_0_axios___default.a.delete('/api/posts/' + post.id).then(function (response) {
                     //this.$router.push('/');
-                    var idx = _this.posts.indexOf(post);
-                    _this.posts.splice(idx, 1);
+                    var idx = _this.posts.data.indexOf(post);
+                    _this.posts.data.splice(idx, 1);
                 }).catch(function (error) {
                     console.log(error);
                 });

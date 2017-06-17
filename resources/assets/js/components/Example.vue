@@ -91,8 +91,8 @@
              if(ok){
              axios.delete('/api/posts/'+post.id).then((response)=>{
                  //this.$router.push('/');
-                 const idx=this.posts.indexOf(post);
-                 this.posts.splice(idx,1);
+                 const idx=this.posts.data.indexOf(post);
+                 this.posts.data.splice(idx,1);
              }).catch((error)=>{
                  console.log(error);
              });
